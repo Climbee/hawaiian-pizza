@@ -51,11 +51,11 @@ public class PurchaseService {
             purchase = purchases.get(0);
         }
         if (purchase.getPizzas() == null) {
-			purchase.setPizzas(new LinkedList<>());
-		}
+            purchase.setPizzas(new LinkedList<>());
+        }
         purchase.setCreationDate(new Date());
         purchase.getPizzas().add(pizza);
-		purchaseRepository.save(purchase);
+        purchaseRepository.save(purchase);
         return purchase;
     }
 
@@ -114,6 +114,18 @@ public class PurchaseService {
         if (pizzas == null) {
             return 0.0;
         }
+
+        // buy 3 pizzas, the cheapest of the 3 is free.
+        if(pizzas.size() >= 3) {
+            double minPrice = Double.MAX_VALUE;
+            for (Pizza pizza : pizzas) {
+                Double price = pizza.getPrice();
+                minPrice = Math.min(minPrice, price);
+                totalPrice += price;
+            }
+            return totalPrice - minPrice;
+        }
+
         // buy a pineapple pizza, get 10% off the others
         boolean applyPineappleDiscount = false;
         for (Pizza pizza : pizzas) {
@@ -126,7 +138,7 @@ public class PurchaseService {
                 totalPrice += pizza.getPrice();
             }  else {
                 if (applyPineappleDiscount) {
-                        totalPrice += pizza.getPrice() *0.9;
+                    totalPrice += pizza.getPrice() *0.9;
                 } else {
                     totalPrice += pizza.getPrice();
                 }
